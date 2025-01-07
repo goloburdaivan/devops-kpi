@@ -1,4 +1,5 @@
 #include "solution.h"
+#include <cmath>
 
 /** Implementation of function to calculate infite sum */
 /** 
