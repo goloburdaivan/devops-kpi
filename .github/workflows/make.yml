@@ -3,10 +3,10 @@ name: Automake CI
 on:
   push:
     branches:
-      - main
+      - branchAutomake
   pull_request:
     branches:
-      - main
+      - branchAutomake
 
 jobs:
   build:
