@@ -3,10 +3,10 @@ name: Automake CI
 on:
   push:
     branches:
-      - branchAutomake
+      - main
   pull_request:
     branches:
-      - branchAutomake
+      - main
 
 jobs:
   build:
@@ -34,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: project-tarball
-        path: *.tar.gz
+        path: "*.tar.gz"
