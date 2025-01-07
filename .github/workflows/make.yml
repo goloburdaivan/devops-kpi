@@ -1,46 +1,33 @@
-name: Build Debian Package
+name: Run Unit Tests
 
 on:
   push:
     branches:
       - main
-      - branchAutoPackage
+      - branchAutoTest
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Prepare Build Environment
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y autotools-dev automake devscripts debhelper build-essential fakeroot
+          sudo apt-get install -y g++ automake autoconf
 
       - name: Generate Build System
         run: |
-          aclocal
-          autoconf
-          automake --add-missing
           autoreconf --install
           ./configure
 
-      - name: Build
-        run: make
-
-      - name: Make Debian Package
+      - name: Build Project and Unit Test
         run: |
-          mkdir -p debian/tmp
-          make install DESTDIR=$(pwd)/debian/tmp
-          dpkg-deb --build debian/tmp myproject.deb
-
-      - name: Upload Debian Package
-        uses: actions/upload-artifact@v3
-        with:
-          name: myproject-deb
-          path: myproject.deb
+          make
+          make check
