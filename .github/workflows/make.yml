@@ -1,12 +1,12 @@
-name: Automake CI
+name: Build Debian Package
 
 on:
   push:
     branches:
-      - main
+      - branchAutoPackage
   pull_request:
     branches:
-      - main
+      - branchAutoPackage
 
 jobs:
   build:
@@ -17,21 +17,19 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: sudo apt-get install -y automake autoconf g++
+      run: sudo apt-get update && sudo apt-get install -y debhelper g++ automake autoconf
 
     - name: Generate build system
       run: |
         autoreconf --install
         ./configure
 
-    - name: Build the project
-      run: make
+    - name: Build Debian package
+      run: |
+        dpkg-buildpackage -us -uc
 
-    - name: Create tarball distribution
-      run: make dist
-
-    - name: Upload tarball artifact
+    - name: Upload Debian package artifact
       uses: actions/upload-artifact@v3
       with:
-        name: project-tarball
-        path: "*.tar.gz"
+        name: debian-package
+        path: "../*.deb"
