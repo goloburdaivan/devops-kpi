@@ -2,5 +2,5 @@
 
 class Solution {
 public:
-    double FuncA();
+    double FuncA(double x, int n);
 }

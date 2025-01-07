@@ -3,6 +3,9 @@
 
 int main() {
     Solution s;
-    std::cout << s.FuncA();
+    double x;
+    std::cin >> x;
+
+    std::cout << s.FuncA(x, 10);
     return 0;
 }
