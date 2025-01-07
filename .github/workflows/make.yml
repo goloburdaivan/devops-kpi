@@ -1,33 +1,68 @@
-name: Run Unit Tests
+name: CI
 
 on:
   push:
-    branches:
-      - main
-      - branchAutoTest
+    branches: [ "*" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "*" ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++ automake autoconf
+    - name: Install QUEMU
+      uses: docker/setup-qemu-action@v3
+    
+    - name: Install Buildx
+      uses: docker/setup-buildx-action@v1
 
-      - name: Generate Build System
-        run: |
-          autoreconf --install
-          ./configure
+    - name: Make Server executable
+      run: chmod +x lab2/lab2/HTTP_Server
 
-      - name: Build Project and Unit Test
-        run: |
-          make
-          make check
+    - name: Make UnitTest executable
+      run: chmod +x lab2/lab2/UnitTest
+
+    - name: Run UnitTest
+      run: |
+        cd lab2/lab2/
+        ./UnitTest
+    
+    - name: Compile UnitTest
+      run: g++ -o UnitTest UnitTest.cpp
+
+    - name: Update Docker to Latest
+      run: |
+        sudo apt-get update
+        sudo apt-get remove docker docker-engine docker.io containerd runc
+        sudo apt-get install -y \
+          apt-transport-https \
+          ca-certificates \
+          curl \
+          software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        docker --version
+        
+    - name: build list
+      run: docker buildx ls
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ vars.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Dockerfile image for amd64
+      run: docker build --platform=linux/amd64 -t artembaidala/http-server:amd64 --push .
+
+    - name: Build Dockerfile image for arm64
+      run: docker build --platform=linux/arm64 -t artembaidala/http-server:arm64 --push .
+
+    - name: Create manifest
+      run: docker manifest create ilyamaluk/devops --amend artembaidala/http-server:amd64 --amend artembaidala/http-server:arm64
+
+    - name: Push manifest to docker hub
+      run: docker manifest push artembaidala/http-server
