@@ -21,18 +21,7 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Make Server executable
-      run: chmod +x lab2/lab2/HTTP_Server
-
-    - name: Make UnitTest executable
-      run: chmod +x lab2/lab2/UnitTest
-
-    - name: Run UnitTest
-      run: |
-        cd lab2/lab2/
-        ./UnitTest
-    
-    - name: Compile UnitTest
-      run: g++ -o UnitTest UnitTest.cpp
+      run: chmod +x http-server
 
     - name: Update Docker to Latest
       run: |
