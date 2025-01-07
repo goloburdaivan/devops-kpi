@@ -1,11 +1,8 @@
-Source: myproject
+Package: myproject
+Version: 1.0-1
 Section: utils
 Priority: optional
-Maintainer: Artem Baidala <test@test.com>
-Build-Depends: debhelper (>= 9), g++, automake, autoconf
-
-Package: myproject
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: MyProject - Example Package
- A C++ project packaged as a Debian package.
+Maintainer: Your Name <youremail@example.com>
+Description: Example package for myproject
+ A simple example of a Debian package for myproject.
